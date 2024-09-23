@@ -1,8 +1,19 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-from prueba import calcular_probabilidades_acumuladas
 import random
+
+# Función para calcular probabilidades acumuladas con redondeo
+def calcular_probabilidades_acumuladas(probabilidades):
+    acumulada = 0
+    probabilidades_acumuladas = []
+    
+    for p in probabilidades:
+        acumulada += p
+        # Redondear a 2 decimales
+        probabilidades_acumuladas.append(round(acumulada, 2))
+    
+    return probabilidades_acumuladas
 
 
 def simular_dia(probabilidades, precios, num_clientes):
