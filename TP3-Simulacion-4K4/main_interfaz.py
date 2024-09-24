@@ -26,7 +26,7 @@ def agregar_datos(grilla, tabla, promedio):
 
 def crear_tabla(raiz):
     ventana = Frame(raiz)
-    ventana.pack()
+    ventana.pack(fill="both", expand=True)
 
     # Columnas básicas (sin la columna de "Iteración")
     columnas_basicas = [
@@ -50,11 +50,15 @@ def crear_tabla(raiz):
     # Crear Treeview sin la columna de ID
     grilla = ttk.Treeview(ventana, columns=tuple(columnas_totales), show="headings")
 
-    # Añadir barra de desplazamiento
-    barra = ttk.Scrollbar(raiz, orient="vertical", command=grilla.yview)
-    barra.pack(side="right", fill="y")
-    raiz.resizable(width=False, height=False)
-    grilla.configure(yscrollcommand=barra.set)
+    # Añadir barra de desplazamiento vertical
+    barra_vertical = ttk.Scrollbar(raiz, orient="vertical", command=grilla.yview)
+    barra_vertical.pack(side="right", fill="y")
+    grilla.configure(yscrollcommand=barra_vertical.set)
+
+    # Añadir barra de desplazamiento horizontal
+    barra_horizontal = ttk.Scrollbar(raiz, orient="horizontal", command=grilla.xview)
+    barra_horizontal.pack(side="bottom", fill="x")
+    grilla.configure(xscrollcommand=barra_horizontal.set)
 
     # Ajustar el ancho de las columnas
     for col in columnas_totales:
@@ -109,13 +113,14 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
             demanda_cliente = cliente[1]  # La demanda del cliente es la segunda posición en la lista
             cantidad_vendida += demanda_cliente
 
+
         # Asegurarse de que cantidad_vendida no exceda el stock inicial
         cantidad_vendida = min(cantidad_vendida, stock_inicial)  # Asegura que no exceda el stock
         stock_final = stock_inicial - cantidad_vendida  # Stock después de la venta
-        costo_produccion = cantidad_vendida * 10  # Costo de producción (ajustar si es necesario)
+        costo_produccion = 200 * 30  # Costo de producción (ajustar si es necesario)
         ingresos = cantidad_vendida * random.choice(precios_unitarios)  # Ingresos
         utilidad = ingresos - costo_produccion  # Utilidad
-        promedio_pastelitos_tirados = round(stock_final / cantidad_dias, 3)  # Promedio de stock tirado
+        promedio_pastelitos_tirados = round(stock_final / (cantidad_dias - 1), 3)  # Promedio de stock tirado
 
         # Armar fila con los datos del día
         fila = [dia, stock_inicial, rnd_clientes, cantidad_clientes]  # Datos iniciales
