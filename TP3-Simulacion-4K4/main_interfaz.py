@@ -86,19 +86,21 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         cantidad_clientes = int(cantidad_clientes)  # Convertir a entero, si es necesario
 
         clientes_datos = []
-        for _ in range(30):  # 30 Clientes
+        for _ in range(cantidad_clientes):
             rnd_demanda = round(random.random(), 2)  # Número aleatorio entre 0 y 1
-
             # Determinar la demanda y el precio basados en rnd_demanda
             for i, prob in enumerate(prob_acumuladas):
                 if rnd_demanda < prob:
                     demanda_cliente = demandas[i]
                     precio_venta_cliente = precios_unitarios[i]
                     break
-
             # Agregar los datos a la lista de clientes
             clientes_datos.append([rnd_demanda, demanda_cliente, precio_venta_cliente])
+        for _ in range (30 - cantidad_clientes):
+            # Agregar los datos a la lista de clientes
+            clientes_datos.append([0, 0, 0])
 
+            
         # Inicializar cantidad_vendida
         cantidad_vendida = 0
 
@@ -113,7 +115,7 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         costo_produccion = cantidad_vendida * 10  # Costo de producción (ajustar si es necesario)
         ingresos = cantidad_vendida * random.choice(precios_unitarios)  # Ingresos
         utilidad = ingresos - costo_produccion  # Utilidad
-        promedio_pastelitos_tirados = stock_final / cantidad_dias  # Promedio de stock tirado
+        promedio_pastelitos_tirados = round(stock_final / cantidad_dias, 3)  # Promedio de stock tirado
 
         # Armar fila con los datos del día
         fila = [dia, stock_inicial, rnd_clientes, cantidad_clientes]  # Datos iniciales
@@ -135,7 +137,8 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas):
     intervalo_final = intervalo_inicial + cantidad_filas
 
     # Filtrar las filas dentro del intervalo
-    filas_a_mostrar = tabla_completa[intervalo_inicial - 1: intervalo_final]
+    filas_a_mostrar = tabla_completa[intervalo_inicial - 1 : intervalo_final -1]
+    filas_a_mostrar.append(tabla_completa[len(tabla_completa) - 1])
 
     return filas_a_mostrar
 
@@ -158,7 +161,7 @@ def llamar_TP():
     prob_acumuladas = calcular_probabilidades_acumuladas(probabilidades)
     
     # Obtener valores de los cuadros de entrada
-    cantidad_dias = int(cuadroCantDias.get())  # Simular por todos los días
+    cantidad_dias = int(cuadroCantDias.get()) + 1 # Simular por todos los días
     cantidad_filas = int(cuadroCantFilas.get())  # Cantidad de filas a mostrar
     intervalo_inicial = int(cuadroIntInicial.get())  # Desde qué fila mostrar
     
