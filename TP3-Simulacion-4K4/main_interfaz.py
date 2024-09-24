@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import Frame, Entry, Label, Button, END
 import random
+from tkinter import messagebox
 
 def truncate(number: float, max_decimals: int) -> float:
     int_part, dec_part = str(number).split(".")
@@ -143,7 +144,9 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas):
 
     # Filtrar las filas dentro del intervalo
     filas_a_mostrar = tabla_completa[intervalo_inicial - 1 : intervalo_final -1]
-    filas_a_mostrar.append(tabla_completa[len(tabla_completa) - 1])
+
+    if intervalo_final <= len(tabla_completa):
+        filas_a_mostrar.append(tabla_completa[-1])
 
     return filas_a_mostrar
 
@@ -166,8 +169,16 @@ def llamar_TP():
     prob_acumuladas = calcular_probabilidades_acumuladas(probabilidades)
     
     # Obtener valores de los cuadros de entrada
-    cantidad_dias = int(cuadroCantDias.get()) + 1 # Simular por todos los días
+    cantidad_dias = int(cuadroCantDias.get()) + 1# Simular por todos los días
+    if cantidad_dias <= 1:
+        messagebox.showerror("Error", "La cantidad de días debe ser mayor a 0")
+        return
     cantidad_filas = int(cuadroCantFilas.get())  # Cantidad de filas a mostrar
+
+    if cantidad_filas > (cantidad_dias - 1):
+        messagebox.showerror("Error", "La cantidad de filas debe ser igual o menor a la cantidad de días")
+        return
+    
     intervalo_inicial = int(cuadroIntInicial.get())  # Desde qué fila mostrar
     
     raiz_tabla = tk.Tk()
