@@ -74,6 +74,17 @@ def crear_tabla(raiz):
     return grilla  # Devolvemos la tabla creada para usarla después
 
 
+def calcular_ingresos(clientes_datos):
+    ingresos_totales = 0
+
+    # Recorremos cada cliente
+    for cliente in clientes_datos:
+        probabilidad, demanda, precio = cliente
+        ingreso = demanda * precio
+        ingresos_totales += ingreso
+
+    return ingresos_totales
+
 # Función para generar todas las filas de la simulación
 def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, cantidad_dias):
     filas = []
@@ -119,7 +130,7 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         cantidad_vendida = min(cantidad_vendida, stock_inicial)  # Asegura que no exceda el stock
         stock_final = stock_inicial - cantidad_vendida  # Stock después de la venta
         costo_produccion = 200 * 30  # Costo de producción (ajustar si es necesario)
-        ingresos = cantidad_vendida * random.choice(precios_unitarios)  # Ingresos
+        ingresos = calcular_ingresos(clientes_datos)
         utilidad = ingresos - costo_produccion  # Utilidad
         promedio_pastelitos_tirados = round(stock_final / (cantidad_dias - 1), 3)  # Promedio de stock tirado
 
