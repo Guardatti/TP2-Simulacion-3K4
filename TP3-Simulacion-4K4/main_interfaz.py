@@ -134,14 +134,12 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
 
 
 # Función para mostrar solo un rango de la simulación completa
-def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas):
+def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, intervalo_final):
     # Convertir a enteros los valores de los cuadros de entrada
     intervalo_inicial = int(intervalo_inicial)
     cantidad_filas = int(cantidad_filas)
+    intervalo_final = int(intervalo_final)
     
-    # Determinar el intervalo final
-    intervalo_final = intervalo_inicial + cantidad_filas
-
     # Filtrar las filas dentro del intervalo
     filas_a_mostrar = tabla_completa[intervalo_inicial - 1 : intervalo_final -1]
 
@@ -173,26 +171,43 @@ def llamar_TP():
     if cantidad_dias <= 1:
         messagebox.showerror("Error", "La cantidad de días debe ser mayor a 0")
         return
+    
     cantidad_filas = int(cuadroCantFilas.get())  # Cantidad de filas a mostrar
-
     if cantidad_filas > (cantidad_dias - 1):
         messagebox.showerror("Error", "La cantidad de filas debe ser igual o menor a la cantidad de días")
         return
     
+    # Simular todos los días (esto es el proceso completo)
+    tabla_completa = generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, cantidad_dias)
+
     intervalo_inicial = int(cuadroIntInicial.get())  # Desde qué fila mostrar
+    if intervalo_inicial <= 0 or intervalo_inicial > cantidad_dias:
+        messagebox.showerror("Error", "El intervalo inicial debe ser al menos 1 y menor a la cantidad de dias")
+        return
     
+    intervalo_final = int(cuadroIntFinal.get())
+    if intervalo_final < intervalo_inicial:
+        messagebox.showerror("Error", "El intervalo final debe ser mayor que el intervalo inicial")
+        return
+    
+    if intervalo_final > cantidad_dias:
+        messagebox.showerror("Error", "El intervalo final excede la cantidad de días disponibles")
+        return
+    
+    # Validar que la cantidad de filas a mostrar coincida con el rango
+    if (intervalo_final - intervalo_inicial + 1) != cantidad_filas:
+        messagebox.showerror("Error", "El intervalo no coincide con la cantidad de filas a mostrar")
+        return
+
     raiz_tabla = tk.Tk()
     raiz_tabla.title("Grupo 6 - Venta Callejera")
     
     # Crear la tabla e inicializar las columnas
     tabla = crear_tabla(raiz_tabla)
-    
-    
-    # Simular todos los días (esto es el proceso completo)
-    tabla_completa = generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, cantidad_dias)
+
     
     # Obtener las filas a mostrar según el intervalo
-    filas_a_mostrar = mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas)
+    filas_a_mostrar = mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, intervalo_final)
     
     # Agregar las filas filtradas a la tabla en la interfaz
     agregar_datos(tabla, filas_a_mostrar, promedio=0.1)
