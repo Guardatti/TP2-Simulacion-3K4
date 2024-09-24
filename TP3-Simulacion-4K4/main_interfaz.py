@@ -159,9 +159,17 @@ def llamar_TP():
     for i, demanda in enumerate(valores_demanda):
         probabilidad = float(entry_probabilidad[i].get())  # Convertir a float
         precio = int(entry_precio[i].get())
+        if precio <= 0:
+            messagebox.showerror("Error", f"El precio en la fila {i + 1} debe ser mayor a 0")
+            return
         probabilidades.append(probabilidad)
         precios_unitarios.append(precio)
         demandas.append(demanda)
+
+    # Validar que la suma de las probabilidades sea igual a 1
+    if round(sum(probabilidades), 2) != 1.00:
+        messagebox.showerror("Error", "La suma de las probabilidades debe ser igual a 1")
+        return
 
     # Calcular las probabilidades acumuladas
     prob_acumuladas = calcular_probabilidades_acumuladas(probabilidades)
