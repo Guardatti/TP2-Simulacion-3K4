@@ -141,11 +141,12 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, 
     intervalo_final = int(intervalo_final)
     
     # Filtrar las filas dentro del intervalo
-    filas_a_mostrar = tabla_completa[intervalo_inicial - 1 : intervalo_final -1]
+    filas_a_mostrar = []
 
-    if intervalo_final <= len(tabla_completa):
-        filas_a_mostrar.append(tabla_completa[-1])
-
+    for i in range(intervalo_inicial - 1, intervalo_final):  # Resta 1 porque el índice es 0 basado
+        if i < len(tabla_completa):  # Verifica que no exceda el tamaño de la tabla completa
+            filas_a_mostrar.append(tabla_completa[i])
+    
     return filas_a_mostrar
 
 
