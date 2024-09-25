@@ -148,7 +148,6 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         filas.append(fila)
 
     promedio_pastelitos_sobrantes = total_pastelitos_sobrantes / (cantidad_dias - 1)
-    print("PRMIEDO: ", promedio_pastelitos_sobrantes)
     promedio_utilidad = total_utilidad / (cantidad_dias - 1)
 
     return filas, promedio_pastelitos_sobrantes, promedio_utilidad
