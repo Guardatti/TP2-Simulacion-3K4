@@ -24,7 +24,7 @@ def agregar_datos(grilla, tabla, pastelitos_tirados_promedio, utilidad_promedio)
     # Mostrar el promedio en un label (si es necesario)
     nombrePromedioUtilidad = Label(grilla.master, text="Utilidad promedio por dia: $" + str(truncate(utilidad_promedio, 2)))
     nombrePromedioUtilidad.pack()
-    nombrePromedioPastelito = Label(grilla.master, text="Promedio de pastelitos tirados por dia: " + str(truncate(pastelitos_tirados_promedio, 2)) + "%")
+    nombrePromedioPastelito = Label(grilla.master, text="Promedio de pastelitos tirados por dia: " + str(truncate(pastelitos_tirados_promedio, 2)))
     nombrePromedioPastelito.pack()
 
 def crear_tabla(raiz):
@@ -138,8 +138,8 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         utilidad = ingresos - costo_produccion  # Utilidad
         promedio_pastelitos_tirados = round(stock_final / (cantidad_dias - 1), 3)  # Promedio de stock tirado
         total_utilidad += utilidad
-        total_pastelitos_sobrantes += promedio_pastelitos_tirados
-
+        total_pastelitos_sobrantes += stock_final
+        #print(total_pastelitos_sobrantes)
         # Armar fila con los datos del día
         fila = [dia, stock_inicial, rnd_clientes, cantidad_clientes]  # Datos iniciales
         fila += clientes_datos  # Añadir los datos de los clientes
@@ -148,6 +148,7 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         filas.append(fila)
 
     promedio_pastelitos_sobrantes = total_pastelitos_sobrantes / (cantidad_dias - 1)
+    print("PRMIEDO: ", promedio_pastelitos_sobrantes)
     promedio_utilidad = total_utilidad / (cantidad_dias - 1)
 
     return filas, promedio_pastelitos_sobrantes, promedio_utilidad
@@ -158,7 +159,7 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, 
     # Convertir a enteros los valores de los cuadros de entrada
     intervalo_inicial = int(intervalo_inicial)
     cantidad_filas = int(cantidad_filas)
-    print(cantidad_filas)
+    #print(cantidad_filas)
     intervalo_final = int(intervalo_final)
     
     # Filtrar las filas dentro del intervalo
