@@ -9,7 +9,7 @@ def truncate(number: float, max_decimals: int) -> float:
     return float(".".join((int_part, dec_part[:max_decimals])))
 
 # Función para agregar datos a la tabla en tiempo de ejecución
-def agregar_datos(grilla, tabla, promedio):
+def agregar_datos(grilla, tabla, pastelitos_tirados_promedio, utilidad_promedio):
     i = 0
     # Añadir datos desde la tabla
     while i != len(tabla):
@@ -22,8 +22,10 @@ def agregar_datos(grilla, tabla, promedio):
         i += 1
 
     # Mostrar el promedio en un label (si es necesario)
-    nombrePromedio = Label(grilla.master, text="Ganancia promedio: $" + str(truncate(promedio, 2)))
-    nombrePromedio.pack()
+    nombrePromedioUtilidad = Label(grilla.master, text="Utilidad promedio por dia: $" + str(truncate(utilidad_promedio, 2)))
+    nombrePromedioUtilidad.pack()
+    nombrePromedioPastelito = Label(grilla.master, text="Promedio de pastelitos tirados por dia: " + str(truncate(pastelitos_tirados_promedio, 2)) + "%")
+    nombrePromedioPastelito.pack()
 
 def crear_tabla(raiz):
     ventana = Frame(raiz)
@@ -88,6 +90,8 @@ def calcular_ingresos(clientes_datos):
 # Función para generar todas las filas de la simulación
 def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, cantidad_dias):
     filas = []
+    total_utilidad = 0
+    total_pastelitos_sobrantes = 0
 
     # Simulación de cada día
     for dia in range(1, cantidad_dias):
@@ -133,6 +137,8 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         ingresos = calcular_ingresos(clientes_datos)
         utilidad = ingresos - costo_produccion  # Utilidad
         promedio_pastelitos_tirados = round(stock_final / (cantidad_dias - 1), 3)  # Promedio de stock tirado
+        total_utilidad += utilidad
+        total_pastelitos_sobrantes += promedio_pastelitos_tirados
 
         # Armar fila con los datos del día
         fila = [dia, stock_inicial, rnd_clientes, cantidad_clientes]  # Datos iniciales
@@ -141,7 +147,10 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
 
         filas.append(fila)
 
-    return filas
+    promedio_pastelitos_sobrantes = total_pastelitos_sobrantes / (cantidad_dias - 1)
+    promedio_utilidad = total_utilidad / (cantidad_dias - 1)
+
+    return filas, promedio_pastelitos_sobrantes, promedio_utilidad
 
 
 # Función para mostrar solo un rango de la simulación completa
@@ -149,6 +158,7 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, 
     # Convertir a enteros los valores de los cuadros de entrada
     intervalo_inicial = int(intervalo_inicial)
     cantidad_filas = int(cantidad_filas)
+    print(cantidad_filas)
     intervalo_final = int(intervalo_final)
     
     # Filtrar las filas dentro del intervalo
@@ -158,6 +168,9 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, 
         if i < len(tabla_completa):  # Verifica que no exceda el tamaño de la tabla completa
             filas_a_mostrar.append(tabla_completa[i])
     
+    if intervalo_final != cantidad_filas:
+        filas_a_mostrar.append(tabla_completa[-1]) #Le agregamos la ultima fila de la simulacion
+
     return filas_a_mostrar
 
 
@@ -198,7 +211,7 @@ def llamar_TP():
         return
     
     # Simular todos los días (esto es el proceso completo)
-    tabla_completa = generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, cantidad_dias)
+    tabla_completa, promedio_pastelitos_sobrantes, promedio_utilidad = generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, cantidad_dias)
 
     intervalo_inicial = int(cuadroIntInicial.get())  # Desde qué fila mostrar
     if intervalo_inicial <= 0 or intervalo_inicial > cantidad_dias:
@@ -230,7 +243,7 @@ def llamar_TP():
     filas_a_mostrar = mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, intervalo_final)
     
     # Agregar las filas filtradas a la tabla en la interfaz
-    agregar_datos(tabla, filas_a_mostrar, promedio=0.1)
+    agregar_datos(tabla, filas_a_mostrar, promedio_pastelitos_sobrantes, promedio_utilidad)
 
 
 # Función para calcular probabilidades acumuladas con redondeo
