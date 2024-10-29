@@ -139,7 +139,7 @@ def generar_simulacion_completa(prob_acumuladas, demandas, precios_unitarios, ca
         promedio_pastelitos_tirados = round(stock_final / (cantidad_dias - 1), 3)  # Promedio de stock tirado
         total_utilidad += utilidad
         total_pastelitos_sobrantes += stock_final
-        #print(total_pastelitos_sobrantes)
+
         # Armar fila con los datos del día
         fila = [dia, stock_inicial, rnd_clientes, cantidad_clientes]  # Datos iniciales
         fila += clientes_datos  # Añadir los datos de los clientes
@@ -158,7 +158,7 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, 
     # Convertir a enteros los valores de los cuadros de entrada
     intervalo_inicial = int(intervalo_inicial)
     cantidad_filas = int(cantidad_filas)
-    #print(cantidad_filas)
+    print(cantidad_filas)
     intervalo_final = int(intervalo_final)
     
     # Filtrar las filas dentro del intervalo
@@ -227,11 +227,6 @@ def llamar_TP():
         messagebox.showerror("Error", "El intervalo final excede la cantidad de días disponibles")
         return
     
-    # Validar que la cantidad de filas a mostrar coincida con el rango
-    if (intervalo_final - intervalo_inicial + 1) != cantidad_filas:
-        messagebox.showerror("Error", "El intervalo no coincide con la cantidad de filas a mostrar")
-        return
-
     raiz_tabla = tk.Tk()
     raiz_tabla.title("Grupo 6 - Venta Callejera")
     

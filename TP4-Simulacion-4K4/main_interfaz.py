@@ -178,7 +178,7 @@ def mostrar_filas_simulacion(tabla_completa, intervalo_inicial, cantidad_filas, 
 def llamar_TP():
     probabilidades_tipo = []  # Lista de probabilidades
     demandas_tipo = []  # Lista de demandas
-    #precios_unitarios = []  # Lista de precios
+    precios_unitarios = []  # Lista de precios
     probabilidades_minutos = []
     demandas_minutos = []
 
@@ -191,7 +191,7 @@ def llamar_TP():
         #    return
         probabilidades_tipo.append(probabilidad)
         #precios_unitarios.append(precio)
-        demandas_tipo.append(demanda)
+        demandas_tipo.append(demanda) #["Pequeños", "Grandes", "Utilitarios"]
 
     for i, demanda in enumerate(valores_tipo_minutos):
         probabilidad = float(entry_probabilidad_minutos[i].get())  # Convertir a float
@@ -307,8 +307,8 @@ cuadroIntFinal.grid(row=4, column=1)
 nombreIntFinal = Label(ventana, text="Intervalo Final a Mostrar (j):", font=("Arial bold", 13), background=back)
 nombreIntFinal.grid(row=4, column=0)
 
-# Valores de demanda, probabilidad y precio por defecto
 valores_tipo_auto = ["Pequeños","Grandes","Utilitarios"]
+# Valores de demanda, probabilidad y precio por defecto
 valores_probabilidad_tipo = [0.45, 0.25,0.30]
 #valores_precio = [100, 100, 100, 80, 80, 80, 80]
 valores_tipo_minutos = [60,120,180,240]
