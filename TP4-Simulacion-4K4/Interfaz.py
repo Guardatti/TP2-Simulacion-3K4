@@ -3,6 +3,9 @@ from tkinter import ttk
 from tkinter import Frame, Entry, Label, Button, END
 import random
 from tkinter import messagebox
+from main import *
+
+
 
 # Función para calcular probabilidades acumuladas con redondeo
 def calcular_probabilidades_acumuladas(probabilidades):
@@ -25,15 +28,15 @@ def llamar_TP():
         probabilidad = float(entry_probabilidad_tipo[i].get())
         prob_tipo_auto.append(probabilidad)
 
-    print(prob_tipo_auto)
-    print(valores_tipo_auto)
+    #print(prob_tipo_auto)
+    #print(valores_tipo_auto)
     
     for i,min_a_estacionar in enumerate(valores_tipo_minutos):
         probabilidad = float(entry_probabilidad_minutos[i].get())
         prob_minutos_estacionar.append(probabilidad)
 
-    print(prob_minutos_estacionar)
-    print(valores_tipo_minutos)
+    #print(prob_minutos_estacionar)
+    #print(valores_tipo_minutos)
 
     # Validar que la suma de las probabilidades sea igual a 1
     if (round(sum(prob_tipo_auto), 2) != 1.00) or (round(sum(prob_minutos_estacionar), 2) != 1.00):
@@ -55,11 +58,25 @@ def llamar_TP():
         messagebox.showerror("Error", "El intervalo final tiene que ser mayor al intervalo incial y no puede superar a X")
         return
 
+    #["Pequeños","Grandes","Utilitarios"]
     prob_acumuladas_tipo_auto = calcular_probabilidades_acumuladas(prob_tipo_auto)
     prob_acumuladas_minutos_estacionar = calcular_probabilidades_acumuladas(prob_minutos_estacionar)
+    
+    #Resto de parametros
+    minutos_a_simular = float(cuadroCantDias.get()) # X
+    tiempo_entre_llegadas = float(prob_entry_llegada.get()) # 13 minutos
+    tiempo_cobro = float(prob_entry_cobro.get()) # 2 minutos
 
-    print(prob_acumuladas_tipo_auto)
+    '''print(prob_acumuladas_tipo_auto)
     print(prob_acumuladas_minutos_estacionar)
+    print(minutos_a_simular)
+    print(tiempo_entre_llegadas)
+    print(tiempo_cobro)
+    print(intervalo_inicial)
+    print(intervalo_final)'''
+    
+    iniciar_simulacion(minutos_a_simular, tiempo_entre_llegadas, tiempo_cobro, intervalo_inicial, intervalo_final, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
+    
 
 
 # Ventana principal
