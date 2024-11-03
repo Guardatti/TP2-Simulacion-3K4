@@ -174,7 +174,7 @@ def truncate(number, decimals=2):
     return int(number * factor) / factor
 
 
-def generar_segunda_fila(primera_fila, encabezados):
+def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar):
     """
     Indices que definen los eventos:
     primera_fila[3] -> Proxima Llegada
@@ -238,19 +238,19 @@ def generar_segunda_fila(primera_fila, encabezados):
             siguiente_encabezado = agregar_vehiculos(encabezados)
             evento = "Llegada vehiculo " + str(contador_vehiculos)
             reloj = proximo_evento[1]
-            t_entre_llegadas = 13.00
+            t_entre_llegadas = tiempo_entre_llegadas
             proxima_llegada = reloj + t_entre_llegadas
             rnd_tipo_vehiculo = truncate(random.random(), 2)
             # rnd_tipo_vehiculo = 0.42
             tipo_vehiculo = determinar_tipo_vehiculo(
                 rnd_tipo_vehiculo,
-                ["Pequeño", "Grande", "Utilitario"],
-                [0.44, 0.69, 0.99],
+                valores_tipo_auto,
+                prob_acumuladas_tipo_auto,
             )
             rnd_t_estacionamiento = truncate(random.random(), 2)
             # wrnd_t_estacionamiento = 0.33
             t_estacionamiento = determinar_tiempo_estacionamiento(
-                rnd_t_estacionamiento, [60, 120, 180, 240], [0.49, 0.79, 0.94, 0.99]
+                rnd_t_estacionamiento, valores_tipo_minutos, prob_acumuladas_minutos_estacionar
             )
             # print(rnd_t_estacionamiento, t_estacionamiento)
             hora_finalizacion = reloj + t_estacionamiento
@@ -274,7 +274,7 @@ def generar_segunda_fila(primera_fila, encabezados):
             siguiente_encabezado = encabezados
             evento = "Llegada vehiculo " + str(contador_vehiculos)
             reloj = proximo_evento[1]
-            t_entre_llegadas = 13
+            t_entre_llegadas = tiempo_entre_llegadas
             proxima_llegada = reloj + t_entre_llegadas
 
     elif proximo_evento[0] == "t_fin_de_cobro":
@@ -283,16 +283,14 @@ def generar_segunda_fila(primera_fila, encabezados):
         reloj = proximo_evento[1]
         t_entre_llegadas = ""
         proxima_llegada = primera_fila[3]
-        rnd_tipo_vehiculo = tipo_vehiculo = rnd_t_estacionamiento = (
-            t_estacionamiento
-        ) = hora_finalizacion = t_cobro = t_fin_de_cobro = ""
+        rnd_tipo_vehiculo = tipo_vehiculo = rnd_t_estacionamiento = t_estacionamiento = hora_finalizacion = t_cobro = t_fin_de_cobro = ""
         if hay_elementos_en_cola == True:
             vechiculo = cola.get()
             estado_zcobro = "Ocupado"
             vehiculo_zcobro = vechiculo
             cola_zcobro -= 1
             vehiculos[vehiculo_zcobro - 1][0] = "En Cola Cobro"
-            t_cobro = 2
+            t_cobro = tiempo_cobro
             t_fin_de_cobro = reloj + t_cobro
         else:
             estado_zcobro = "Libre"
@@ -311,12 +309,8 @@ def generar_segunda_fila(primera_fila, encabezados):
             evento = "Fin Sector " + (str(proximo_evento[0].split("_")[1]))
             reloj = proximo_evento[1]
             t_entre_llegadas = ""
-            rnd_tipo_vehiculo = tipo_vehiculo = rnd_t_estacionamiento = (
-                t_estacionamiento
-            ) = hora_finalizacion = ""
-            id_vehiculo_cola_cobro = sectores[int(proximo_evento[0].split("_")[1]) - 1][
-                1
-            ]
+            rnd_tipo_vehiculo = tipo_vehiculo = rnd_t_estacionamiento = t_estacionamiento = hora_finalizacion = ""
+            id_vehiculo_cola_cobro = sectores[int(proximo_evento[0].split("_")[1]) - 1][1]
             encolar_elemento(id_vehiculo_cola_cobro)
             cola_zcobro += 1
             sectores[int(proximo_evento[0].split("_")[1]) - 1] = ["Libre", "", ""]
@@ -338,7 +332,7 @@ def generar_segunda_fila(primera_fila, encabezados):
             rnd_tipo_vehiculo = tipo_vehiculo = rnd_t_estacionamiento = (
                 t_estacionamiento
             ) = hora_finalizacion = ""
-            t_cobro = 2
+            t_cobro = tiempo_cobro
             t_fin_de_cobro = reloj + t_cobro
             estado_zcobro = "Ocupado"
             vehiculo_zcobro = sectores[int(proximo_evento[0].split("_")[1]) - 1][1]
@@ -390,8 +384,7 @@ def generar_segunda_fila(primera_fila, encabezados):
     ]
 
 
-# def iniciar_simulacion(minutos_a_simular, tiempo_entre_llegadas, tiempo_cobro, intervalo_inicial, intervalo_final, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar):
-def iniciar_simulacion():
+def iniciar_simulacion(minutos_a_simular, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar):
     grilla = []
     encabezados = generar_encabezados()
     # print('encabezados F1> ', encabezados, end="\n")
@@ -400,16 +393,15 @@ def iniciar_simulacion():
     # print('primera_fila> ', primera_fila, end="\n")
     grilla.append(primera_fila)
 
-    segunda_fila = generar_segunda_fila(primera_fila, encabezados)
+    segunda_fila = generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
     # print('encabezados F2> ', segunda_fila[3], end="\n")
     # print('segunda_fila> ', segunda_fila[0], end="\n")
     grilla.append(segunda_fila[0])
 
-    minutos_a_simular = 1000
     reloj = segunda_fila[0][1]
     contador_fila = 3
-    while reloj <= minutos_a_simular:
-        segunda_fila = generar_segunda_fila(segunda_fila[0], segunda_fila[3])
+    while reloj < minutos_a_simular:
+        segunda_fila = generar_segunda_fila(segunda_fila[0], segunda_fila[3], tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
         # print('\nencabezados F', contador_fila, '> ', segunda_fila[3], end="\n")
         # print('Fila ', contador_fila, '> ', segunda_fila[0], end="\n")
         reloj = segunda_fila[0][1]
@@ -425,7 +417,7 @@ def iniciar_simulacion():
     return segunda_fila[3], grilla
 
 
-def main():
+def dibujar_grafico(encabezados, grilla, intervalo_inicial, intervalo_final):
     print("Simulacion Comenzada")
 
     # Crear ventana de Tkinter
@@ -436,9 +428,6 @@ def main():
     # Frame para contener el Treeview y las barras de desplazamiento
     frame = tk.Frame(ventana)
     frame.pack(expand=True, fill="both")
-
-    # Generar encabezado
-    encabezados, grilla = iniciar_simulacion()
 
     # Configurar Treeview
     tree = ttk.Treeview(frame, columns=encabezados, show="headings")
@@ -465,7 +454,3 @@ def main():
 
     # Ejecutar ventana
     ventana.mainloop()
-
-
-if __name__ == "__main__":
-    main()
