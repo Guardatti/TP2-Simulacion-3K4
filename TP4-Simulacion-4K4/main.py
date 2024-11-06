@@ -57,19 +57,18 @@ def generar_encabezados():
         "Cantidad Cobrada",
         "Ac Recaudacion Playa",
         "Ac Tiempo de Utilizacion",
-        "Ac Vehiculos sin lugar",
     ]  # contadores y acumuladores
     # encabezado += ["Vehiculo 1"] #Aca tengo que agregar cada vehiculo que vaya apareciendo en la simulacion
     # encabezado2 = agregar_vehiculo(encabezado)
     return encabezado
 
 
-def generar_primera_fila(tiempo_entre_llegadas):
+def generar_primera_fila():
     return [
         "Inicializacion",
         0.00,
-        tiempo_entre_llegadas,
-        tiempo_entre_llegadas,
+        13.00,
+        13.00,
         "",
         "",
         "",
@@ -88,7 +87,6 @@ def generar_primera_fila(tiempo_entre_llegadas):
         ["Libre", "", ""],
         ["Libre", "", ""],
         ["Libre", "", ""],
-        0,
         0,
         0,
         0,
@@ -199,15 +197,6 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
     vehiculo_zcobro = primera_fila[12]
     cola_zcobro = primera_fila[13]
 
-    # Sectores (14 al 21) se dividen en estado, vehículo asociado y hora finalización
-    """sector1 = primera_fila[14]
-    sector2 = primera_fila[15]
-    sector3 = primera_fila[16]
-    sector4 = primera_fila[17]
-    sector5 = primera_fila[18]
-    sector6 = primera_fila[19]
-    sector7 = primera_fila[20]
-    sector8 = primera_fila[21]"""
     sectores = [
         primera_fila[14],
         primera_fila[15],
@@ -223,10 +212,9 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
     cantidad_cobrada = primera_fila[22]
     ac_recaudacion_playa = primera_fila[23]
     ac_tiempo_de_utilizacion = primera_fila[24]
-    ac_vehiculos_fuera = primera_fila[25]
 
     # Vehículo 1, con separación de atributos de "estado" y "hora de llegada"
-    vehiculos = primera_fila[26]
+    vehiculos = primera_fila[25]
 
     # Buscarmos el proximo evento
     proximo_evento = obtener_proximo_evento(primera_fila)
@@ -258,10 +246,10 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
             # print(rnd_t_estacionamiento, t_estacionamiento)
             hora_finalizacion = reloj + t_estacionamiento
             t_cobro = ""
-            #t_fin_de_cobro = ""
-            #estado_zcobro = "Libre"
-            #vehiculo_zcobro = ""
-            #cola_zcobro = 0
+            t_fin_de_cobro = ""
+            estado_zcobro = "Libre"
+            vehiculo_zcobro = ""
+            cola_zcobro = 0
             sectores[posicion_sector_libre] = [
                 "Ocupado",
                 contador_vehiculos,
@@ -274,13 +262,11 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
         else:
             # print("NO HAY SECTORES LIBRES")
             # print(posicion_sector_libre)
-            incrementar_contador()
             siguiente_encabezado = encabezados
             evento = "Llegada vehiculo " + str(contador_vehiculos)
             reloj = proximo_evento[1]
             t_entre_llegadas = tiempo_entre_llegadas
             proxima_llegada = reloj + t_entre_llegadas
-            ac_vehiculos_fuera +=1
 
     elif proximo_evento[0] == "t_fin_de_cobro":
         siguiente_encabezado = encabezados
@@ -289,8 +275,6 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
         t_entre_llegadas = ""
         proxima_llegada = primera_fila[3]
         rnd_tipo_vehiculo = tipo_vehiculo = rnd_t_estacionamiento = t_estacionamiento = hora_finalizacion = t_cobro = t_fin_de_cobro = ""
-        #print("Cola:")
-        #list(cola.queue)
         if hay_elementos_en_cola() == True:
             vechiculo = cola.get()
             estado_zcobro = "Ocupado"
@@ -307,12 +291,11 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
             cantidad_cobrada = 0
         ac_recaudacion_playa += cantidad_cobrada
         # ac_tiempo_de_utilizacion = ac_recaudacion_playa
-        vehiculos[vehiculo_zcobro - 1] = ["Cobrado", int(vehiculos[vehiculo_zcobro - 1][1])]
+        vehiculos[vehiculo_zcobro - 1] = ["", ""]
         vehiculo_zcobro = ""
 
     else:
-        #print(estado_zcobro)
-        if estado_zcobro == "Ocupado": 
+        if estado_zcobro == "Ocupado":
             siguiente_encabezado = encabezados
             evento = "Fin Sector " + (str(proximo_evento[0].split("_")[1]))
             reloj = proximo_evento[1]
@@ -325,7 +308,7 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
             cobro = 0
             cantidad_cobrada = 0
             ac_recaudacion_playa += cantidad_cobrada
-            ac_tiempo_de_utilizacion += int(reloj) - int(vehiculos[vehiculo_zcobro - 1][1])
+            ac_tiempo_de_utilizacion += reloj - int(vehiculos[vehiculo_zcobro - 1][1])
             vehiculos[vehiculo_zcobro - 1] = [
                 "En Cola Cobro",
                 int(vehiculos[vehiculo_zcobro - 1][1]),
@@ -384,7 +367,6 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
             cantidad_cobrada,
             ac_recaudacion_playa,
             ac_tiempo_de_utilizacion,
-            ac_vehiculos_fuera,
             vehiculos,
         ],
         proximo_evento[0],
@@ -396,47 +378,46 @@ def generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiemp
 def iniciar_simulacion(minutos_a_simular, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar):
     grilla = []
     encabezados = generar_encabezados()
-    # print('encabezados F1> ', encabezados, end="\n")
 
-    primera_fila = generar_primera_fila(tiempo_entre_llegadas)
-    # print('primera_fila> ', primera_fila, end="\n")
+    primera_fila = generar_primera_fila()
     grilla.append(primera_fila)
 
     segunda_fila = generar_segunda_fila(primera_fila, encabezados, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
-    # print('encabezados F2> ', segunda_fila[3], end="\n")
-    # print('segunda_fila> ', segunda_fila[0], end="\n")
     grilla.append(segunda_fila[0])
 
     reloj = segunda_fila[0][1]
-    contador_fila = 3
     while reloj < minutos_a_simular:
         segunda_fila = generar_segunda_fila(segunda_fila[0], segunda_fila[3], tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
-        # print('\nencabezados F', contador_fila, '> ', segunda_fila[3], end="\n")
-        # print('Fila ', contador_fila, '> ', segunda_fila[0], end="\n")
+
         reloj = segunda_fila[0][1]
-        contador_fila += 1
         vector_vehiculos = segunda_fila[0][-1]
         fila_vehiculos_aplanada = [sublista for sublista in vector_vehiculos]
         fila_final = segunda_fila[0][:-1] + fila_vehiculos_aplanada
         # Agrega fila_final a la grilla
         grilla.append(fila_final)
 
-    # print(grilla)
+    # Elimina la última fila de la grilla si es necesario
+    if grilla:
+        grilla.pop()  # Elimina la última fila
+
+    #print(grilla)
 
     return segunda_fila[3], grilla
 
 
-def dibujar_grafico(encabezados, grilla, intervalo_inicial, intervalo_final):
-    print("Simulacion Comenzada")
+def dibujar_grafico(encabezados, grilla, minuto_inicial, cantidad_iteraciones):
+    print("Simulación Comenzada")
+
+    # Filtrar las filas a partir del minuto_inicial
+    filas_filtradas = [fila for fila in grilla if fila[1] >= minuto_inicial]
+
+    # Si cantidad_iteraciones es mayor que el número de filas filtradas, mostramos solo las que existen
+    filas_a_mostrar = filas_filtradas[:cantidad_iteraciones]
 
     # Crear ventana de Tkinter
     ventana = tk.Tk()
     ventana.title("Simulación - Sistema de Colas")
-    try:
-        ventana.state("zoomed")  # Esto funciona en Windows, pero puede fallar en Linux.
-    except tk.TclError:
-        ventana.attributes("-zoomed", True)  # Alternativa para algunos entornos
-        ventana.geometry(f"{ventana.winfo_screenwidth()}x{ventana.winfo_screenheight()}")  # O tamaño completo manual
+    ventana.state("zoomed")
 
     # Frame para contener el Treeview y las barras de desplazamiento
     frame = tk.Frame(ventana)
@@ -461,9 +442,30 @@ def dibujar_grafico(encabezados, grilla, intervalo_inicial, intervalo_final):
     scrollbar_x.pack(side="bottom", fill="x")
     tree.configure(xscrollcommand=scrollbar_x.set)
 
-    # Insertar datos de la grilla en el Treeview
-    for fila in grilla:
+    # Insertar las filas filtradas en el Treeview
+    for fila in filas_a_mostrar:
         tree.insert("", "end", values=fila)
+    
+    if len(grilla) > cantidad_iteraciones: 
+        tree.insert("", "end", values=grilla[-1])
+
+    # Mostrar los resultados de la simulación en una sección debajo de la tabla
+    resultados_frame = tk.Frame(ventana)
+    resultados_frame.pack(pady=10)
+
+    resultados_simulacion = {
+    "Recaudacion Total de la Playa": f"${grilla[-1][23]:,}",  # Formateo con $ y separador de miles
+    "Porcentaje de utilizacion de la playa": f"{round(grilla[-1][24] / (grilla[-1][1] * 8) * 100, 2)}%",  # Formateo con símbolo %
+    }
+
+    # Crear etiquetas para cada resultado
+    for key, value in resultados_simulacion.items():
+        label_text = f"{key}: {value}"
+        resultado_label = tk.Label(resultados_frame, text=label_text, font=("Arial", 12))
+        resultado_label.pack(anchor="w")
+
+    # Ejecutar ventana
+    ventana.mainloop()
 
     # Ejecutar ventana
     ventana.mainloop()

@@ -41,19 +41,19 @@ def llamar_TP():
         messagebox.showerror("Error", "La suma de las probabilidades debe ser igual a 1")
         return
     
-    cantidad_minutos = float(cuadroCantDias.get())
+    cantidad_minutos = int(cuadroCantDias.get())
     if cantidad_minutos > 100000:
         messagebox.showerror("Error", "La cantidad de minutos no puede superar los 100.000")
         return
-
-    intervalo_inicial = int(cuadroIntInicial.get())
-    if intervalo_inicial < 0 or intervalo_inicial >= cantidad_minutos: ##Revisar
-        messagebox.showerror("Error", "El intervalo inicial tiene que ser mayor a 0 y no puede superar a X")
-        return
     
     intervalo_final = int(cuadroIntFinal.get())
-    if intervalo_final <= intervalo_inicial or intervalo_final > cantidad_minutos: ##Revisar
-        messagebox.showerror("Error", "El intervalo final tiene que ser mayor al intervalo incial y no puede superar a X")
+    if intervalo_final < 0 or intervalo_final > cantidad_minutos:
+        messagebox.showerror("Error", "La cantidad de minutos no puede ser menor a 0 y no puede superar a X")
+        return
+
+    intervalo_inicial = int(cuadroIntInicial.get())
+    if intervalo_inicial > (cantidad_minutos - intervalo_final) or intervalo_final < 0: ##Revisar
+        messagebox.showerror("Error", "La cantidad de iteraciones no puede ser mayor a la diferencia entre X y j y mayor a 0")
         return
 
     #["Pequeños","Grandes","Utilitarios"]
@@ -61,7 +61,6 @@ def llamar_TP():
     prob_acumuladas_minutos_estacionar = calcular_probabilidades_acumuladas(prob_minutos_estacionar)
     
     #Resto de parametros
-    minutos_a_simular = float(cuadroCantDias.get()) # X
     tiempo_entre_llegadas = float(prob_entry_llegada.get()) # 13 minutos
     tiempo_cobro = float(prob_entry_cobro.get()) # 2 minutos
 
@@ -73,10 +72,8 @@ def llamar_TP():
     print(intervalo_inicial)
     print(intervalo_final)'''
     
-    encabezados, grilla = iniciar_simulacion(minutos_a_simular, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
-    intervalo_inicial = 1
-    intervalo_final = 3 
-    dibujar_grafico(encabezados, grilla, intervalo_inicial, intervalo_final)
+    encabezados, grilla = iniciar_simulacion(cantidad_minutos, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar, num_sectores=10)
+    dibujar_grafico(encabezados, grilla, intervalo_final, intervalo_inicial)
 
 
 # Ventana principal
@@ -98,17 +95,17 @@ cuadroCantDias.grid(row=1, column=1)
 nombreCantDias = Label(ventana, text="Cantidad de Minutos a Simular (X):", font=("Arial bold", 13), background=back)
 nombreCantDias.grid(row=1, column=0)
 
-# Entrada de "Intervalo Inicial a Mostrar (i)"
-cuadroIntInicial = Entry(ventana, font=("Arial bold", 13))
-cuadroIntInicial.grid(row=2, column=1)
-nombreIntInicial = Label(ventana, text="Intervalo Inicial a Mostrar (i):", font=("Arial bold", 13), background=back)
-nombreIntInicial.grid(row=2, column=0)
-
 # Entrada de "Intervalo Final a Mostrar (j)"
 cuadroIntFinal = Entry(ventana, font=("Arial bold", 13))
-cuadroIntFinal.grid(row=3, column=1)
-nombreIntFinal = Label(ventana, text="Intervalo Final a Mostrar (j):", font=("Arial bold", 13), background=back)
-nombreIntFinal.grid(row=3, column=0)
+cuadroIntFinal.grid(row=2, column=1)
+nombreIntFinal = Label(ventana, text="Minuto Inicial a Mostrar (j):", font=("Arial bold", 13), background=back)
+nombreIntFinal.grid(row=2, column=0)
+
+# Entrada de "Intervalo Inicial a Mostrar (i)"
+cuadroIntInicial = Entry(ventana, font=("Arial bold", 13))
+cuadroIntInicial.grid(row=3, column=1)
+nombreIntInicial = Label(ventana, text="Cantidad de Iteraciones (i):", font=("Arial bold", 13), background=back)
+nombreIntInicial.grid(row=3, column=0)
 
 # Valores de demanda, probabilidad y precio por defecto
 valores_tipo_auto = ["Pequeños","Grandes","Utilitarios"]
