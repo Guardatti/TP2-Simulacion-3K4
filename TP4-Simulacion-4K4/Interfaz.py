@@ -72,7 +72,7 @@ def llamar_TP():
     print(intervalo_inicial)
     print(intervalo_final)'''
     
-    encabezados, grilla = iniciar_simulacion(cantidad_minutos, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar, num_sectores=10)
+    encabezados, grilla = iniciar_simulacion(cantidad_minutos, tiempo_entre_llegadas, tiempo_cobro, valores_tipo_auto, valores_tipo_minutos, prob_acumuladas_tipo_auto, prob_acumuladas_minutos_estacionar)
     dibujar_grafico(encabezados, grilla, intervalo_final, intervalo_inicial)
 
 
